@@ -1,0 +1,23 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudPopoverProvider />
+
+<MudLayout>
+    <MudAppBar Color="Color.Surface" Fixed="true" Elevation="2">
+        <MudImage Src="images/logo.png"
+                  Width="40"
+                  Height="40"
+                  Alt="Logo"
+                  ObjectFit="ObjectFit.Contain"
+                  Class="ma-2" />
+    </MudAppBar>
+    <MudDrawer Open="true" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <NavMenu></NavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>

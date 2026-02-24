@@ -1,0 +1,46 @@
+﻿@page "/customers"
+@inject CustomerApiService CustomerService
+
+<PageTitle>Gestão de Clientes</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-8">
+	@* Cabeçalho da Página *@
+	<div class="d-flex align-center justify-space-between mb-6">
+		<div>
+			<MudText Typo="Typo.h4" Color="Color.Primary" Class="fw-bold">Clientes</MudText>
+			<MudText Typo="Typo.subtitle2" Color="Color.Secondary">Gerencie o cadastro e informações dos seus clientes</MudText>
+		</div>
+
+		<MudButton Variant="Variant.Filled"
+				   Color="Color.Primary"
+				   StartIcon="@Icons.Material.Filled.Add"
+				   Size="Size.Large"
+				   href="create">
+			Novo Cliente
+		</MudButton>
+	</div>
+
+	@* Componente de Card que contém a Tabela que estilizamos *@
+	<MudPaper Elevation="0" Class="pa-4 rounded-xl border-1 border-solid mud-border-outline">
+		<CustomerManagementCard DeleteCustomer="Delete" GetCustomersProvider="FetchCustomersFromApi" UpdateCustomer="Update" />
+	</MudPaper>
+</MudContainer>
+
+@code {
+	private async Task<PaginationResponseDTO<ResponseCustomerDTO>> FetchCustomersFromApi(int skip, int take)
+	{
+
+		return await CustomerService.GetCustomer(skip, take);
+	}
+
+	private async Task Delete(int id)
+	{
+		await CustomerService.DeleteCustomer(id);
+	}
+
+	private async Task Update(ResponseCustomerDTO dto)
+	{
+		await CustomerService.UpdateCustomer(dto.Id, new UpdateCustomerDTO(dto.Name, dto.Description));
+
+	}
+}

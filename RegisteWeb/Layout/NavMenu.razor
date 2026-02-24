@@ -1,0 +1,29 @@
+﻿<MudNavMenu border="true">
+    <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="ml-4 mt-3 mb-1">GERAL</MudText>
+
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">
+        Dashboard
+    </MudNavLink>
+
+    <MudNavGroup Title="Clientes" Icon="@Icons.Material.Filled.People" Expanded="true">
+        <MudNavLink Href="/customers" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">
+            Consultar Lista
+        </MudNavLink>
+        <MudNavLink Href="/create" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonAdd">
+            Novo Cadastro
+        </MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Financeiro" Icon="@Icons.Material.Filled.AttachMoney">
+        <MudNavLink Href="/invoices" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Receipt">
+            Lançar Despesa
+        </MudNavLink>
+        <MudNavLink Href="/reports" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.BarChart">
+            Relatórios
+        </MudNavLink>
+    </MudNavGroup>
+
+    <MudDivider Class="my-2" />
+
+    <MudNavLink Href="/settings" Icon="@Icons.Material.Filled.Settings">Configurações</MudNavLink>
+</MudNavMenu>

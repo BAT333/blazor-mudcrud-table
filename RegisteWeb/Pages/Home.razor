@@ -1,0 +1,50 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-8 text-center">
+
+    <MudPaper Elevation="2" Class="pa-8 mb-10 rounded-lg">
+        <MudText Typo="Typo.h3" Color="Color.Primary" Class="fw-bold mb-2">Painel de Gestão</MudText>
+        <MudText Typo="Typo.h6" Class="mud-text-secondary">Bem-vindo ao sistema de faturamento direto.</MudText>
+    </MudPaper>
+
+    <MudGrid Spacing="4" Justify="Justify.Center">
+
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="4" Class="pa-6 h-100 d-flex flex-column align-center justify-center">
+                <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Color="Color.Primary" Style="font-size: 5rem;" />
+                <MudCardContent>
+                    <MudText Typo="Typo.h5" Class="fw-bold">Novo Registro</MudText>
+                    <MudText Typo="Typo.body1" Class="mud-text-secondary mt-2">
+                        Cadastre um novo cliente ou conta no sistema.
+                    </MudText>
+                </MudCardContent>
+                <MudCardActions Class="mt-auto">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" href="create" FullWidth="true">
+                        Acessar Cadastro
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="4" Class="pa-6 h-100 d-flex flex-column align-center justify-center">
+                <MudIcon Icon="@Icons.Material.Filled.Receipt" Color="Color.Success" Style="font-size: 5rem;" />
+                <MudCardContent>
+                    <MudText Typo="Typo.h5" Class="fw-bold">Faturas Únicas</MudText>
+                    <MudText Typo="Typo.body1" Class="mud-text-secondary mt-2">
+                        Gerencie as despesas e faturamentos pendentes.
+                    </MudText>
+                </MudCardContent>
+                <MudCardActions Class="mt-auto">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Success" FullWidth="true">
+                        Ver Faturas
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+    </MudGrid>
+
+</MudContainer>

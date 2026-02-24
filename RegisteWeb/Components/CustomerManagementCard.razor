@@ -1,0 +1,203 @@
+﻿@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<MudTable ServerData="LoadCustomersData"
+		  Hover="true"
+		  Dense="true"
+		  Striped="true"
+		  Bordered="false"
+		  Breakpoint="Breakpoint.Sm"
+		  Elevation="4"
+		  @ref="_table"
+		  T="ResponseCustomerDTO"
+		  @bind-SelectedItem="_selectedElement"
+		  CanCancelEdit="true"
+		  RowEditPreview="@(item => BackupItem((ResponseCustomerDTO)item))"
+		  RowEditCancel="@(item =>ResetItemValues((ResponseCustomerDTO)item))"
+		  RowEditCommit="@(async item => await UpdateCustomerData((ResponseCustomerDTO)item))"
+		  EditTrigger="TableEditTrigger.RowClick"
+		  RowClassFunc="@SelectedRowClassFunc"
+		  Virtualize="true"
+		  FixedHeader="true"
+		  RowsPerPage="10"
+		  Height="450px"
+		  Class="rounded-lg border-none">
+
+	<ToolBarContent>
+		<MudText Typo="Typo.h6" Color="Color.Primary">
+			<MudIcon Icon="@Icons.Material.Filled.People" Class="mr-2 mb-n1" /> Clientes
+		</MudText>
+		<MudSpacer />
+	</ToolBarContent>
+
+	<HeaderContent>
+		<MudTh>ID</MudTh>
+		<MudTh>Nome</MudTh>
+		<MudTh>Descrição</MudTh>
+		<MudTh Style="text-align:right">Ações</MudTh>
+	</HeaderContent>
+
+	<RowTemplate>
+		<MudTd DataLabel="ID">
+			<MudChip T="string" Size="Size.Small" Color="Color.Info" Variant="Variant.Text">@context.Id</MudChip>
+		</MudTd>
+		<MudTd DataLabel="Nome" Class="fw-bold">@context.Name</MudTd>
+		<MudTd DataLabel="Descrição">
+			<MudText Typo="Typo.body2" Class="text-truncate" Style="max-width: 250px;">
+				@context.Description
+			</MudText>
+		</MudTd>
+		<MudTd Style="text-align:right">
+			<MudTooltip Text="Editar Cliente">
+				<MudIconButton Icon="@Icons.Material.Filled.Edit"
+							   Size="Size.Small"
+							   Color="Color.Default"
+							   OnClick="@(() =>_table.FocusCellAsync(context,1))" />
+			</MudTooltip>
+			<MudTooltip Text="Excluir Cliente">
+				<MudIconButton Icon="@Icons.Material.Filled.DeleteOutline"
+							   Color="Color.Error"
+							   Size="Size.Small"
+							   OnClick="@(() => DeletarCustomerData(context))" />
+			</MudTooltip>
+		</MudTd>
+	</RowTemplate>
+
+	<RowEditingTemplate>
+		<MudTd DataLabel="ID">@context.Id</MudTd>
+		<MudTd DataLabel="Nome">
+			<MudTextField @bind-Value="context.Name" Variant="Variant.Outlined" Margin="Margin.Dense" Required />
+		</MudTd>
+		<MudTd DataLabel="Descrição">
+			<MudTextField @bind-Value="context.Description" Variant="Variant.Outlined" Margin="Margin.Dense" Required />
+		</MudTd>
+		<MudTd></MudTd>
+	</RowEditingTemplate>
+
+	<PagerContent>
+		<MudDivider />
+		<MudTablePager RowsPerPageString="Linhas por página:"
+					   InfoFormat="{first_item}-{last_item} de {all_items}" />
+	</PagerContent>
+
+	<NoRecordsContent>
+		<div class="d-flex flex-column align-center justify-center pa-8">
+			<MudIcon Icon="@Icons.Material.Filled.SearchOff" Size="Size.Large" Color="Color.Default" />
+			<MudText Typo="Typo.body1" Color="Color.Secondary">Nenhum cliente encontrado.</MudText>
+		</div>
+	</NoRecordsContent>
+
+	<LoadingContent>
+		<MudText Typo="Typo.body1" Align="Align.Center" Class="pa-4">Carregando dados...</MudText>
+	</LoadingContent>
+</MudTable>
+
+@code {
+	[Parameter]
+	public Func<int, int, Task<PaginationResponseDTO<ResponseCustomerDTO>>> GetCustomersProvider { get; set; } = default!;
+
+	[Parameter]
+	public EventCallback<ResponseCustomerDTO> UpdateCustomer { get; set; }
+
+	[Parameter]
+	public EventCallback<int> DeleteCustomer { get; set; }
+
+	private MudTable<ResponseCustomerDTO> _table = null!;
+	private ResponseCustomerDTO? _selectedElement;
+	private ResponseCustomerDTO? elementBeforeEdit;
+
+	private string SelectedRowClassFunc(ResponseCustomerDTO element, int rowNumber)
+	{
+		if (_selectedElement != null && _selectedElement.Equals(element))
+			return "selected";
+
+		return string.Empty;
+	}
+
+	private void BackupItem(ResponseCustomerDTO element)
+	{
+		var item = element;
+		elementBeforeEdit = new ResponseCustomerDTO
+		{
+			Id = item.Id,
+			Name = item.Name,
+			Description = item.Description
+		};
+	}
+
+	private void ResetItemValues(ResponseCustomerDTO element)
+	{
+		var item = element;
+		if (elementBeforeEdit != null)
+		{
+			item.Name = elementBeforeEdit.Name;
+			item.Description = elementBeforeEdit.Description;
+		}
+	}
+
+	private async Task<TableData<ResponseCustomerDTO>> LoadCustomersData(TableState state, CancellationToken token)
+	{
+		try
+		{
+			if (GetCustomersProvider == null)
+				return new TableData<ResponseCustomerDTO> { TotalItems = 0, Items = new List<ResponseCustomerDTO>() };
+
+			int skip = state.Page * state.PageSize;
+			int take = state.PageSize;
+
+			var result = await GetCustomersProvider.Invoke(skip, take);
+
+			return new TableData<ResponseCustomerDTO>()
+			{
+				TotalItems = result.Total,
+				Items = result.Items
+			};
+		}
+		catch (Exception ex)
+		{
+
+			Snackbar.Add(ex.Message, Severity.Error);
+			return new TableData<ResponseCustomerDTO>();
+		}
+	}
+
+	private async Task UpdateCustomerData(ResponseCustomerDTO element)
+	{
+		var item = element;
+
+		if (item is not null && UpdateCustomer.HasDelegate)
+		{
+			try
+			{
+				await UpdateCustomer.InvokeAsync(item);
+			}
+			catch (Exception ex)
+			{
+				Snackbar.Add(ex.Message, Severity.Error);
+			}
+		}
+	}
+
+	private async Task DeletarCustomerData(ResponseCustomerDTO customer)
+	{
+		bool? result = await DialogService.ShowMessageBox(
+			"Aviso",
+			$"Deseja realmente excluir o cliente {customer.Name}?",
+			yesText: "Excluir!",
+			cancelText: "Cancelar");
+
+		if (result == true && DeleteCustomer.HasDelegate)
+		{
+			try
+			{
+				await DeleteCustomer.InvokeAsync(customer.Id);
+				await _table.ReloadServerData();
+			}
+			catch (Exception ex)
+			{
+				Snackbar.Add(ex.Message, Severity.Error);
+			}
+		}
+	}
+
+}

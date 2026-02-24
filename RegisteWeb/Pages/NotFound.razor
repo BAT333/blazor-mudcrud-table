@@ -1,0 +1,35 @@
+﻿@page "/not-found"
+@layout MainLayout
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="d-flex align-center justify-center" Style="height: 80vh;">
+    <MudPaper Elevation="0" Class="pa-12 rounded-lg text-center bg-transparent">
+
+        @* Ícone de busca com efeito sutil *@
+        <MudIcon Icon="@Icons.Material.Filled.SearchOff"
+                 Color="Color.Secondary"
+                 Style="font-size: 120px; opacity: 0.6;"
+                 Class="mb-4" />
+
+        <MudText Typo="Typo.h2" Color="Color.Default" Class="fw-bold mb-2">
+            404
+        </MudText>
+
+        <MudText Typo="Typo.h5" Color="Color.Secondary" Class="mb-6">
+            Ops! Não encontramos o que você estava procurando.
+        </MudText>
+
+        <MudText Typo="Typo.body1" Class="mud-text-secondary mb-8">
+            A página pode ter sido removida ou o endereço está incorreto.
+        </MudText>
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   StartIcon="@Icons.Material.Filled.Home"
+                   Href="/"
+                   Class="rounded-pill px-8">
+            Voltar ao Início
+        </MudButton>
+
+    </MudPaper>
+</MudContainer>

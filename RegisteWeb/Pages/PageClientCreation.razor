@@ -1,0 +1,108 @@
+﻿@page "/create"
+@inject CustomerApiService CustomerService
+@inject ISnackbar Snackbar
+
+<PageTitle>Create Customer</PageTitle>
+
+<MudGrid Justify="Justify.Center" Class="mt-4">
+    <MudItem xs="12" sm="8" md="6">
+        <MudPaper Elevation="4" Class="pa-6 rounded-lg">
+
+            <MudText Typo="Typo.h5" Class="mb-4" Color="Color.Primary">
+                <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Class="me-2" />
+                Novo Registo
+            </MudText>
+
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+                <MudGrid Spacing="2">
+                    <MudItem xs="12">
+                        <MudTextField T="string" Label="Username"
+                                      Required="true"
+                                      RequiredError="O nome de utilizador é obrigatório!"
+                                      @bind-Value="model.Name"
+                                      For="@(() => model.Name)"
+                                      Variant="Variant.Outlined"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Badge" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudTextField T="string" Label="Description"
+                                      Required="true"
+                                      RequiredError="A descrição é obrigatória!"
+                                      @bind-Value="model.Description"
+                                      For="@(() => model.Description)"
+                                      Variant="Variant.Outlined"
+                                      Lines="3"
+                                      Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Filled.Description" />
+                    </MudItem>
+
+                    <MudItem xs="12" Class="d-flex justify-end mt-2">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   Size="Size.Large"
+                                   Disabled="@(!success || loading)"
+                                   OnClick="Create"
+                                   Class="rounded-pill px-8">
+                            @if (loading)
+                            {
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+                                <span>A processar...</span>
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.Save" Class="me-2" />
+                                <span>Registar Cliente</span>
+                            }
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private MudForm form;
+    private bool success;
+    private string[] errors = { };
+    private CreateCustomerDTO model = new();
+    private bool loading = false;
+
+    private async Task Create()
+    {
+        await form.Validate();
+
+        if (!form.IsValid)
+            return;
+
+        loading = true;
+
+        try
+        {
+            var customerDTO = await CustomerService.PostCustomer(model);
+
+            if (customerDTO is not null)
+            {
+                Snackbar.Add($"Client {customerDTO.Name} successfully registered.", Severity.Success);
+
+                model = new();
+                await form.ResetAsync();
+            }
+            else
+            {
+                Snackbar.Add("Error registering customer, please try again.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            loading = false;
+        }
+	}
+
+}
