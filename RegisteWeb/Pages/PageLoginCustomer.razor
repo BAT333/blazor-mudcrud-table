@@ -1,0 +1,118 @@
+﻿@page "/login"
+@inject ISnackbar Snackbar;
+@inject AuthCustomerApiService authCustomerApiService;
+
+<PageTitle>Login</PageTitle>
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit" @bind-IsValid="@success">
+	<DataAnnotationsValidator />
+
+	<MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+		<MudGrid Justify="Justify.Center">
+			<MudItem xs="12">
+				<MudCard Elevation="4" Class="pa-4">
+					<MudCardHeader>
+						<CardHeaderContent>
+							<MudText Typo="Typo.h5" Align="Align.Center"><b>Login Conta</b></MudText>
+							<MudText Typo="Typo.body2" Align="Align.Center" Color="Color.Secondary">
+								Preencha os dados abaixo para começar
+							</MudText>
+						</CardHeaderContent>
+					</MudCardHeader>
+
+					<MudCardContent>
+						<MudTextField Label="E-mail"
+									  Variant="Variant.Outlined"
+									  @bind-Value="model.Email"
+									  For="@(() => model.Email)"
+									  Disabled="@(success || loading)"
+									  Adornment="Adornment.Start"
+									  AdornmentIcon="@Icons.Material.Filled.Email"
+									  Class="mb-4" />
+
+						<MudTextField Label="Palavra-passe"
+									  Variant="Variant.Outlined"
+									  @bind-Value="model.Password"
+									  For="@(() => model.Password)"
+									  Disabled="@(success || loading)"
+									  InputType="@_passwordInput"
+									  Adornment="Adornment.End"
+									  AdornmentIcon="@_passwordInputIcon"
+									  OnAdornmentClick="TogglePasswordVisibility"
+									  HelperText="Escolha uma senha forte" />
+					</MudCardContent>
+
+					<MudCardActions Class="d-flex justify-center pb-6">
+						<MudButton ButtonType="ButtonType.Submit"
+								   Variant="Variant.Filled"
+								   Color="Color.Primary"
+								   Size="Size.Large"
+								   Disabled="@(success||loading)"
+								   FullWidth="true"
+								   Style="border-radius: 8px;">
+							@if (loading)
+							{
+								<MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+								<span>A processar...</span>
+
+							}
+							else
+							{
+								<span>Login</span>
+
+							}
+						</MudButton>
+					</MudCardActions>
+				</MudCard>
+			</MudItem>
+		</MudGrid>
+	</MudContainer>
+</EditForm>
+@code {
+	private bool loading = false;
+	private MudForm form;
+	private bool success;
+	private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+	private LoginCustomerDTO model = new();
+
+	private bool _passwordVisible;
+	private InputType _passwordInput = InputType.Password;
+
+	private void TogglePasswordVisibility()
+	{
+		if (_passwordVisible)
+		{
+			_passwordVisible = false;
+			_passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+			_passwordInput = InputType.Password;
+		}
+		else
+		{
+			_passwordVisible = true;
+			_passwordInputIcon = Icons.Material.Filled.Visibility;
+			_passwordInput = InputType.Text;
+		}
+	}
+
+	private async Task OnValidSubmit(EditContext context)
+	{
+		loading = true;
+		success = true;
+
+		try
+		{
+			await this.authCustomerApiService.AuthCustomer(model);
+			Snackbar.Add("Login successfully", Severity.Success);
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add($"Error when logging in: {ex.Message}", Severity.Error);
+		}
+		finally
+		{
+			loading = false;
+			success = false;
+		}
+	}
+}

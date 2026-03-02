@@ -10,15 +10,24 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddTransient<CustomerApiService>();
+builder.Services.AddTransient<AuthCustomerApiService>();
+builder.Services.AddScoped<CookieHandler>();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-builder.Services.AddHttpClient("API", cliet =>
+builder.Services.AddHttpClient("API", client =>
 {
-     cliet.BaseAddress = new Uri(builder.Configuration["APIServer:Url"]!);
-    cliet.DefaultRequestHeaders.Add("Accept", "application/json");
+    client.BaseAddress = new Uri(builder.Configuration["APIServer:Url"]!);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
 
-});
+}).AddHttpMessageHandler<CookieHandler>(); ;
+
+builder.Services.AddHttpClient("AUTH", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["APIServer:Url"]!);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+}).AddHttpMessageHandler<CookieHandler>();
 
 
 builder.Services.AddMudServices(config =>

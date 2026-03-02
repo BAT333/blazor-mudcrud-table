@@ -1,0 +1,129 @@
+﻿@page "/CreateLogin"
+@inject AuthCustomerApiService authCustomerApiService;
+@inject ISnackbar Snackbar;
+
+
+<PageTitle>Criar Conta</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small" Class="d-flex align-center justify-center mt-10" Style="min-height: 80vh;">
+	<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+		<DataAnnotationsValidator />
+
+		<MudCard Elevation="5" Class="pa-8" Style="border-radius: 16px;">
+			<MudCardHeader Class="pb-0">
+				<CardHeaderContent>
+					<MudText Typo="Typo.h4" Align="Align.Center" Color="Color.Primary"><b>Registo</b></MudText>
+					<MudText Typo="Typo.body2" Align="Align.Center" Class="mb-4">Crie a sua conta em poucos segundos</MudText>
+				</CardHeaderContent>
+			</MudCardHeader>
+
+			<MudCardContent>
+				<MudTextField Label="Nome de Utilizador"
+							  @bind-Value="model.Username"
+							  For="@(() => model.Username)"
+							  Variant="Variant.Outlined"
+							  Adornment="Adornment.Start"
+							  AdornmentIcon="@Icons.Material.Filled.Person"
+							  Margin="Margin.Normal" />
+
+				<MudTextField Label="E-mail"
+							  @bind-Value="model.Email"
+							  For="@(() => model.Email)"
+							  Variant="Variant.Outlined"
+							  Adornment="Adornment.Start"
+							  AdornmentIcon="@Icons.Material.Filled.Email"
+							  Class="mt-4" />
+
+				<MudTextField Label="Password"
+							  @bind-Value="model.Password"
+							  For="@(() => model.Password)"
+							  Variant="Variant.Outlined"
+							  InputType="@_passwordInput"
+							  Adornment="Adornment.End"
+							  AdornmentIcon="@_passwordInputIcon"
+							  OnAdornmentClick="TogglePasswordVisibility"
+							  Class="mt-4" />
+
+				<MudTextField Label="Confirmar Password"
+							  @bind-Value="model.PasswordCompare"
+							  For="@(() => model.PasswordCompare)"
+							  Variant="Variant.Outlined"
+							  InputType="@_passwordInput"
+							  Adornment="Adornment.End"
+							  AdornmentIcon="@_passwordInputIcon"
+							  OnAdornmentClick="TogglePasswordVisibility"
+							  Class="mt-4" />
+			</MudCardContent>
+
+			<MudCardActions Class="d-flex flex-column gap-4 px-4 pb-4">
+				<MudButton ButtonType="ButtonType.Submit"
+						   Variant="Variant.Filled"
+						   Color="Color.Primary"
+						   FullWidth="true"
+						   Size="Size.Large"
+						   Style="height: 50px; font-weight: bold;"
+						   Disabled="@(success || loading)">
+
+					@if (success)
+					{
+						<MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+						<span>A processar...</span>
+
+					}
+					else
+					{
+						<span>Finalizar Registo</span>
+					}
+				</MudButton>
+			</MudCardActions>
+		</MudCard>
+	</EditForm>
+</MudContainer>
+
+@code {
+
+	private CreateLoginCustomerDTO model = new CreateLoginCustomerDTO();
+	private bool success;
+	private bool loading;
+
+	private bool _passwordVisible;
+	private InputType _passwordInput = InputType.Password;
+	private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+	private void TogglePasswordVisibility()
+	{
+		if (_passwordVisible)
+		{
+			_passwordVisible = false;
+			_passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+			_passwordInput = InputType.Password;
+		}
+		else
+		{
+			_passwordVisible = true;
+			_passwordInputIcon = Icons.Material.Filled.Visibility;
+			_passwordInput = InputType.Text;
+		}
+	}
+
+	private async Task OnValidSubmit(EditContext context)
+	{
+		loading = true;
+		success = true;
+
+		try
+		{
+			await this.authCustomerApiService.RegisterCustomer(model);
+			Snackbar.Add("Account created successfully", Severity.Success);
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add($"Error creating account: {ex.Message}", Severity.Error);
+		}
+		finally
+		{
+			loading = false;
+			success = false;
+		}
+	}
+}
