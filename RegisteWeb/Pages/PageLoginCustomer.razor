@@ -4,70 +4,79 @@
 
 <PageTitle>Login</PageTitle>
 
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit" @bind-IsValid="@success">
-	<DataAnnotationsValidator />
+<AuthorizeView Context="auth">
+	<Authorized>
+		<MudAlert Severity="Severity.Info" Variant="Variant.Filled" Class="mt-4">
+			Olá, @auth.User.Identity?.Name! Já te encontras autenticado no sistema.
+		</MudAlert>
+	</Authorized>
 
-	<MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
-		<MudGrid Justify="Justify.Center">
-			<MudItem xs="12">
-				<MudCard Elevation="4" Class="pa-4">
-					<MudCardHeader>
-						<CardHeaderContent>
-							<MudText Typo="Typo.h5" Align="Align.Center"><b>Login Conta</b></MudText>
-							<MudText Typo="Typo.body2" Align="Align.Center" Color="Color.Secondary">
-								Preencha os dados abaixo para começar
-							</MudText>
-						</CardHeaderContent>
-					</MudCardHeader>
+	<NotAuthorized>
+		<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+			<DataAnnotationsValidator />
 
-					<MudCardContent>
-						<MudTextField Label="E-mail"
-									  Variant="Variant.Outlined"
-									  @bind-Value="model.Email"
-									  For="@(() => model.Email)"
-									  Disabled="@(success || loading)"
-									  Adornment="Adornment.Start"
-									  AdornmentIcon="@Icons.Material.Filled.Email"
-									  Class="mb-4" />
+			<MudContainer MaxWidth="MaxWidth.Small" Class="mt-16">
+				<MudGrid Justify="Justify.Center">
+					<MudItem xs="12">
+						<MudCard Elevation="4" Class="pa-4">
+							<MudCardHeader>
+								<CardHeaderContent>
+									<MudText Typo="Typo.h5" Align="Align.Center"><b>Login Conta</b></MudText>
+									<MudText Typo="Typo.body2" Align="Align.Center" Color="Color.Secondary">
+										Preencha os dados abaixo para começar
+									</MudText>
+								</CardHeaderContent>
+							</MudCardHeader>
 
-						<MudTextField Label="Palavra-passe"
-									  Variant="Variant.Outlined"
-									  @bind-Value="model.Password"
-									  For="@(() => model.Password)"
-									  Disabled="@(success || loading)"
-									  InputType="@_passwordInput"
-									  Adornment="Adornment.End"
-									  AdornmentIcon="@_passwordInputIcon"
-									  OnAdornmentClick="TogglePasswordVisibility"
-									  HelperText="Escolha uma senha forte" />
-					</MudCardContent>
+							<MudCardContent>
+								<MudTextField Label="E-mail"
+											  Variant="Variant.Outlined"
+											  @bind-Value="model.Email"
+											  For="@(() => model.Email)"
+											  Disabled="@(loading)"
+											  Adornment="Adornment.Start"
+											  AdornmentIcon="@Icons.Material.Filled.Email"
+											  Class="mb-4" />
 
-					<MudCardActions Class="d-flex justify-center pb-6">
-						<MudButton ButtonType="ButtonType.Submit"
-								   Variant="Variant.Filled"
-								   Color="Color.Primary"
-								   Size="Size.Large"
-								   Disabled="@(success||loading)"
-								   FullWidth="true"
-								   Style="border-radius: 8px;">
-							@if (loading)
-							{
-								<MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
-								<span>A processar...</span>
+								<MudTextField Label="Palavra-passe"
+											  Variant="Variant.Outlined"
+											  @bind-Value="model.Password"
+											  For="@(() => model.Password)"
+											  Disabled="@(loading)"
+											  InputType="@_passwordInput"
+											  Adornment="Adornment.End"
+											  AdornmentIcon="@_passwordInputIcon"
+											  OnAdornmentClick="TogglePasswordVisibility"
+											  HelperText="Escolha uma senha forte" />
+							</MudCardContent>
 
-							}
-							else
-							{
-								<span>Login</span>
+							<MudCardActions Class="d-flex justify-center pb-6">
+								<MudButton ButtonType="ButtonType.Submit"
+										   Variant="Variant.Filled"
+										   Color="Color.Primary"
+										   Size="Size.Large"
+										   Disabled="@(loading)"
+										   FullWidth="true"
+										   Style="border-radius: 8px;">
+									@if (loading)
+									{
+										<MudProgressCircular Size="Size.Small" Indeterminate="true" Class="me-2" />
+										<span>A processar...</span>
+									}
+									else
+									{
+										<span>Login</span>
+									}
+								</MudButton>
+							</MudCardActions>
+						</MudCard>
+					</MudItem>
+				</MudGrid>
+			</MudContainer>
+		</EditForm>
+	</NotAuthorized>
+</AuthorizeView>
 
-							}
-						</MudButton>
-					</MudCardActions>
-				</MudCard>
-			</MudItem>
-		</MudGrid>
-	</MudContainer>
-</EditForm>
 @code {
 	private bool loading = false;
 	private MudForm form;

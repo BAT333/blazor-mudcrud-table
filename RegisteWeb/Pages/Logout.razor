@@ -1,0 +1,14 @@
+﻿@inject AuthCustomerApiService authCustomerApiService;
+@page "/logout"
+
+@code {
+
+	protected override async Task OnInitializedAsync()
+	{
+		var verificationAuthenticated = await authCustomerApiService.VerificationAuthenticated();
+		if (verificationAuthenticated)
+		{
+			await this.authCustomerApiService.LogoutAsync();
+		}
+	}
+}
