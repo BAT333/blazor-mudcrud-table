@@ -1,6 +1,9 @@
 ﻿@page "/login"
 @inject ISnackbar Snackbar;
 @inject AuthCustomerApiService authCustomerApiService;
+@inject NavigationManager navigation;
+
+@attribute [AllowAnonymous]
 
 <PageTitle>Login</PageTitle>
 
@@ -88,6 +91,9 @@
 	private bool _passwordVisible;
 	private InputType _passwordInput = InputType.Password;
 
+	[SupplyParameterFromQuery]
+	public string? ReturnUrl { get; set; }
+
 	private void TogglePasswordVisibility()
 	{
 		if (_passwordVisible)
@@ -111,8 +117,12 @@
 
 		try
 		{
-			await this.authCustomerApiService.AuthCustomer(model);
-			Snackbar.Add("Login successfully", Severity.Success);
+			var response = await this.authCustomerApiService.AuthCustomer(model);
+			if (response.IsSuccessStatusCode)
+			{
+				Snackbar.Add("Login successfully", Severity.Success);
+				navigation.NavigateTo(string.IsNullOrEmpty(ReturnUrl) ? "/" : ReturnUrl);
+			}
 		}
 		catch (Exception ex)
 		{

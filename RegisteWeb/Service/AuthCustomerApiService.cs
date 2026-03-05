@@ -42,13 +42,15 @@ namespace RegisteWeb.Service
             return new AuthenticationState(customerClaims);
         }
 
-        public async Task AuthCustomer(LoginCustomerDTO login)
+        public async Task<HttpResponseMessage> AuthCustomer(LoginCustomerDTO login)
         {
 
             var response = await this._httpClient.PostAsJsonAsync("auth/login?useCookies=true", login);
             response.EnsureSuccessStatusCode();
 
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
+            return response;
         }
 
         public async Task RegisterCustomer(CreateLoginCustomerDTO createLogin)
